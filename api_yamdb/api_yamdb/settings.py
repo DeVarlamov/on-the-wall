@@ -97,8 +97,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
-#AUTH_USER_MODEL = 'reviews.User'
-
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 TOKEN_EMAIL = 'super@yamdb.test'
@@ -111,6 +109,4 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
-USER = 'user'
-MODERATOR = 'moderator'
-ADMIN = 'admin'
+AUTH_USER_MODEL = 'reviews.User'
