@@ -29,8 +29,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
 }
 
 MIDDLEWARE = [
@@ -68,7 +66,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    },
+    }
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -113,5 +111,3 @@ SIMPLE_JWT = {
 
 
 AUTH_USER_MODEL = 'reviews.User'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
