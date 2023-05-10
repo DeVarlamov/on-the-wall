@@ -1,19 +1,20 @@
+from api import serializers
+from api.permission import IsAdmin, IsAdminUserOrReadOnly
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from api.permission import IsAdmin, IsAdminUserOrReadOnly,
-from rest_framework import mixins, viewsets
-from reviews.models import User,Category, Genre, Title
-from .serializers import (RegisterDataSerializer,
-                          TokenSerializer, UserEditSerializer, UserSerializer)
-from api import serializers
-from rest_framework.filters import SearchFilter
+from reviews.models import Category, Genre, Title, User
+
+from .serializers import (CategorySerializer, GenreSerializer,
+                          RegisterDataSerializer, TokenSerializer,
+                          UserEditSerializer, UserSerializer)
 
 
 @api_view(["POST"])
@@ -103,7 +104,7 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-      
+
 class CreateRetrieveViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -115,7 +116,7 @@ class CreateRetrieveViewSet(
 
 class GenreViewSet(CreateRetrieveViewSet):
     queryset = Genre.objects.all()
-    serializer_class = serializers.GenreSerializer
+    serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
@@ -124,7 +125,7 @@ class GenreViewSet(CreateRetrieveViewSet):
 
 class CategoryViewSet(CreateRetrieveViewSet):
     queryset = Category.objects.all()
-    serializer_class = serializers.CategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
