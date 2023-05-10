@@ -74,6 +74,15 @@ class UserAdmin(admin.ModelAdmin):
         'last_name',
         'confirmation_code',
     )
+    fields = (
+        'username',
+        'email',
+        'role',
+        'bio',
+        'first_name',
+        'last_name',
+        'confirmation_code',
+    )
     search_fields = (
         'username',
         'role',

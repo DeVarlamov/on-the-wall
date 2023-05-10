@@ -1,7 +1,6 @@
-from datetime import timedelta
 import os
+from datetime import timedelta
 from pathlib import Path
-
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,14 +18,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework_simplejwt',
-    'api',
     'reviews',
+    'api',
 ]
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
@@ -98,15 +99,15 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
+
 TOKEN_EMAIL = 'super@yamdb.test'
 
 SIMPLE_JWT = {
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=15),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(minutes=30),
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=100),
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
 
 AUTH_USER_MODEL = 'reviews.User'
