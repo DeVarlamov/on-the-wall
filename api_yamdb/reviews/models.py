@@ -50,7 +50,7 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=False,
-        default='XXXX',
+        default='No_code',
     )
 
     @property
@@ -125,16 +125,21 @@ class Title(models.Model):
         null=True,
         blank=True,
     )
+    """
     genre = models.ManyToManyField(
         Genre,
         related_name='titles',
         verbose_name='жанр',
     )
+    """
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+    )
 
     class Meta:
-        ordering = ('name',)
-        verbose_name = 'Произведение'
-        verbose_name_plural = 'Произведения'
+        verbose_name = 'произведение'
+        verbose_name_plural = 'произведения'
 
     def __str__(self):
         return self.name
@@ -206,8 +211,35 @@ class Comment(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'комментарии'
 
     def __str__(self):
         return self.text
+
+
+class GenreTitle(models.Model):
+    """Связь жанра и произведения."""
+
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='жанр',
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='произведение',
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=('genre', 'title'),
+                name='unique_genre_title',
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.title} => {self.genre}'
