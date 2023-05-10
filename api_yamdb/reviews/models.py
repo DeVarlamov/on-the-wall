@@ -80,6 +80,7 @@ class Category(models.Model):
     name = models.CharField('имя категории', max_length=200)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'категория'
         verbose_name_plural = 'категории'
 
@@ -94,6 +95,7 @@ class Genre(models.Model):
     name = models.CharField('имя жанра', max_length=200)
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'жанр'
         verbose_name_plural = 'жанры'
 
@@ -130,6 +132,7 @@ class Title(models.Model):
     )
 
     class Meta:
+        ordering = ('name',)
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
