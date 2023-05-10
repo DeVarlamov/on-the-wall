@@ -4,7 +4,7 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from api.validate import validate_username_me, validate_username_bad_sign
 
-from reviews.models import User
+from reviews.models import User, Category, Genre, Title
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -72,3 +72,34 @@ class TokenSerializer(serializers.Serializer):
     """Класс сериализатора для генерации и проверки токенов аутентификации."""
     username = serializers.CharField()
     confirmation_code = serializers.CharField()
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Category
+
+
+class TitleSerializer(serializers.ModelSerializer):
+    category = serializers.SlugRelatedField(  # type: ignore [var-annotated]
+        queryset=Category.objects.all(),
+        slug_field='slug',
+        required=True,
+    )
+
+    genre = serializers.SlugRelatedField(  # type: ignore [var-annotated]
+        queryset=Genre.objects.all(),
+        slug_field='slug',
+        many=True,
+        required=True,
+    )
+
+    class Meta:
+        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        model = Title
+
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('name', 'slug')
+        model = Genre
