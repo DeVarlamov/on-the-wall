@@ -1,21 +1,28 @@
-from api import serializers
-from api.permission import IsAdmin
+from api.filters import TitleFilter
+from api.permissions import IsAdmin, IsAdminUserOrReadOnly
+from api.serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    RegisterDataSerializer,
+    TitleGetSerializer,
+    TitlePostSerializer,
+    TokenSerializer,
+    UserEditSerializer,
+    UserSerializer,
+)
+from api.viewsets import CreateListDestroyViewSet
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
-from api.viewsets import CreateListDestroyViewSet
 from reviews.models import Category, Genre, Title, User
-
-from .serializers import (CategorySerializer, GenreSerializer,
-                          RegisterDataSerializer, TokenSerializer,
-                          UserEditSerializer, UserSerializer)
 
 
 @api_view(['POST'])
@@ -27,9 +34,10 @@ def register(request):
     try:
         user = serializer.save()
     except ValidationError as error:
-        return Response({'detail': str(error)},
-                        status=status.HTTP_400_BAD_REQUEST
-                        )
+        return Response(
+            {'detail': str(error)},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
@@ -50,18 +58,20 @@ def get_jwt_token(request):
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User,
-        username=serializer.validated_data['username']
+        username=serializer.validated_data['username'],
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data['confirmation_code']
+        user,
+        serializer.validated_data['confirmation_code'],
     ):
         token = AccessToken.for_user(user)
         return Response({'token': str(token)}, status=status.HTTP_200_OK)
 
-    return Response({'detail': 'неверный код'},
-                    status=status.HTTP_400_BAD_REQUEST
-                    )
+    return Response(
+        {'detail': 'неверный код'},
+        status=status.HTTP_400_BAD_REQUEST,
+    )
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -73,6 +83,7 @@ class UserViewSet(viewsets.ModelViewSet):
     - /users/me/ - ПОЛУЧИТЬ и исправить для просмотра и обновления профиля
     аутентифицированного пользователя
     """
+
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -100,7 +111,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(
                 user,
                 data=request.data,
-                partial=True
+                partial=True,
             )
             serializer.is_valid(raise_exception=True)
             serializer.save()
@@ -109,26 +120,42 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class GenreViewSet(CreateListDestroyViewSet):
+    """
+    Viewset для обработки операций CRUD по жанрам.
+    """
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
+    """
+    Viewset для обработки операций CRUD по категориям.
+    """
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdmin,)
+    permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
     lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """
+    Viewset для обработки операций CRUD по тайтлам.
+    """
+
     queryset = Title.objects.all()
-    serializer_class = serializers.TitleSerializer
-    permission_classes = (IsAdmin,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name', 'category__slug', 'genre__slug', 'year')
+    permission_classes = (IsAdminUserOrReadOnly,)
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilter
+
+    def get_serializer_class(self):
+        if self.action in ('create', 'update', 'partial_update'):
+            return TitlePostSerializer
+        return TitleGetSerializer
