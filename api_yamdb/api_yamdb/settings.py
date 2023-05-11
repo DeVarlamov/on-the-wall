@@ -67,7 +67,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    },
 }
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -112,3 +112,5 @@ SIMPLE_JWT = {
 
 
 AUTH_USER_MODEL = 'reviews.User'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -10,12 +10,13 @@ from api.serializers import (
     UserEditSerializer,
     UserSerializer,
 )
+from api.viewsets import CreateListDestroyViewSet
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import mixins, permissions, status, viewsets
+from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
@@ -116,16 +117,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class CreateRetrieveViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
-    pass
-
-
-class GenreViewSet(CreateRetrieveViewSet):
+class GenreViewSet(CreateListDestroyViewSet):
     """
     Viewset для обработки операций CRUD по жанрам.
     """
@@ -138,7 +130,7 @@ class GenreViewSet(CreateRetrieveViewSet):
     lookup_field = 'slug'
 
 
-class CategoryViewSet(CreateRetrieveViewSet):
+class CategoryViewSet(CreateListDestroyViewSet):
     """
     Viewset для обработки операций CRUD по категориям.
     """
