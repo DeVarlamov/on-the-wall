@@ -38,6 +38,26 @@ class UserEditSerializer(serializers.ModelSerializer):
     """Класс сериализатора для редактирования
     объектов пользовательской модели
     """
+    username = serializers.CharField(
+        max_length=150,
+        validators=[
+            validate_username_bad_sign,
+        ]
+    )
+    email = serializers.EmailField(
+        max_length=254,
+    )
+    role = serializers.CharField(
+        max_length=20,
+        read_only=True,
+    )
+    bio = serializers.CharField()
+    first_name = serializers.CharField(
+        max_length=150,
+    )
+    last_name = serializers.CharField(
+        max_length=150,
+    )
 
     class Meta:
         fields = (
