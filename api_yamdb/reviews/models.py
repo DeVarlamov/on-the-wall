@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -46,11 +48,11 @@ class User(AbstractUser):
     first_name = models.CharField('имя', max_length=150, blank=True)
     last_name = models.CharField('фамилия', max_length=150, blank=True)
     confirmation_code = models.CharField(
-       'код подтверждения',
-       max_length=255,
-       null=True,
-       blank=False,
-       default='XXXX',
+        'код подтверждения',
+        max_length=255,
+        null=True,
+        blank=False,
+        default='XXXX',
     )
 
     @property
@@ -109,7 +111,12 @@ class Title(models.Model):
     name = models.CharField('название', max_length=200, db_index=True)
     year = models.IntegerField(
         'год',
-        # validators=(validate_year, )
+        validators=(
+            MaxValueValidator(
+                limit_value=datetime.now().year,
+                message='год выпуска не может превышать текущий год',
+            ),
+        ),
     )
     category = models.ForeignKey(
         Category,
