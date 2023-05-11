@@ -21,7 +21,7 @@ class IsAdmin(permissions.BasePermission):
         )
 
 
-class IsAdminUserOrReadOnly(permissions.IsAdminUser):
+class IsAdminUserOrReadOnly(IsAdmin):
     """
     Пользовательский класс разрешений, который проверяет, является ли
     запрашивающий пользователь администратором.

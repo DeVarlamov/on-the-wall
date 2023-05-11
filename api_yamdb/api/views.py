@@ -1,8 +1,11 @@
-from api import serializers
 from api.filters import TitleFilter
 from api.permissions import IsAdmin, IsAdminUserOrReadOnly
 from api.serializers import (
+    CategorySerializer,
+    GenreSerializer,
     RegisterDataSerializer,
+    TitleGetSerializer,
+    TitlePostSerializer,
     TokenSerializer,
     UserEditSerializer,
     UserSerializer,
@@ -128,7 +131,7 @@ class GenreViewSet(CreateRetrieveViewSet):
     """
 
     queryset = Genre.objects.all()
-    serializer_class = serializers.GenreSerializer
+    serializer_class = GenreSerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
@@ -141,7 +144,7 @@ class CategoryViewSet(CreateRetrieveViewSet):
     """
 
     queryset = Category.objects.all()
-    serializer_class = serializers.CategorySerializer
+    serializer_class = CategorySerializer
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (SearchFilter,)
     search_fields = ('name',)
@@ -159,6 +162,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
-        if self.action in ('create', 'update'):
-            return serializers.TitlePostSerializer
-        return serializers.TitleGetSerializer
+        if self.action in ('create', 'update', 'partial_update'):
+            return TitlePostSerializer
+        return TitleGetSerializer

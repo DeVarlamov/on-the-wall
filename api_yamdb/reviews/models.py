@@ -82,7 +82,6 @@ class Category(models.Model):
     name = models.CharField('имя категории', max_length=200)
 
     class Meta:
-        ordering = ('name',)
         verbose_name = 'категория'
         verbose_name_plural = 'категории'
 
@@ -97,7 +96,6 @@ class Genre(models.Model):
     name = models.CharField('имя жанра', max_length=200)
 
     class Meta:
-        ordering = ('name',)
         verbose_name = 'жанр'
         verbose_name_plural = 'жанры'
 
@@ -108,7 +106,7 @@ class Genre(models.Model):
 class Title(models.Model):
     """Произведения"""
 
-    name = models.CharField('название', max_length=200, db_index=True)
+    name = models.CharField('название', max_length=256, db_index=True)
     year = models.IntegerField(
         'год',
         validators=(
@@ -139,7 +137,6 @@ class Title(models.Model):
     )
 
     class Meta:
-        ordering = ('name',)
         verbose_name = 'Произведение'
         verbose_name_plural = 'Произведения'
 
