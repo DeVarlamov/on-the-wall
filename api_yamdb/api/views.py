@@ -76,13 +76,15 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = PageNumberPagination
     permission_classes = (IsAdmin,)
+    search_fields = ('username',)
+    filter_backends = (SearchFilter,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     @action(
         methods=[
-            'GET',
-            'PATC',
+            'get',
+            'patch',
         ],
         detail=False,
         url_path='me',
@@ -90,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer_class=UserEditSerializer,
     )
     def users_own_profile(self, request):
-        user = request.user
+        user = get_object_or_404(User, username=self.request.user)
         if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
