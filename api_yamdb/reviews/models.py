@@ -52,7 +52,7 @@ class User(AbstractUser):
         max_length=255,
         null=True,
         blank=False,
-        default='XXXX',
+        default='No_code',
     )
 
     @property
@@ -70,6 +70,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
@@ -134,14 +135,13 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        related_name='titles',
-        verbose_name='жанр',
+        through='GenreTitle',
     )
 
     class Meta:
+        verbose_name = 'произведение'
+        verbose_name_plural = 'произведения'
         ordering = ('name',)
-        verbose_name = 'Произведение'
-        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -177,6 +177,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'отзыв'
         verbose_name_plural = 'отзывы'
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
                 # Ограничение: один отзыв на одно произведение
@@ -213,8 +214,36 @@ class Comment(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'комментарии'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text
+
+
+class GenreTitle(models.Model):
+    """Связь жанра и произведения."""
+
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.SET_NULL,
+        null=True,
+        verbose_name='жанр',
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='произведение',
+    )
+
+    class Meta:
+        constraints = (
+            models.UniqueConstraint(
+                fields=('genre', 'title'),
+                name='unique_genre_title',
+            ),
+        )
+
+    def __str__(self):
+        return f'{self.title} => {self.genre}'
