@@ -68,6 +68,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'пользователь'
         verbose_name_plural = 'пользователи'
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
@@ -125,13 +126,6 @@ class Title(models.Model):
         null=True,
         blank=True,
     )
-    """
-    genre = models.ManyToManyField(
-        Genre,
-        related_name='titles',
-        verbose_name='жанр',
-    )
-    """
     genre = models.ManyToManyField(
         Genre,
         through='GenreTitle',
@@ -140,6 +134,7 @@ class Title(models.Model):
     class Meta:
         verbose_name = 'произведение'
         verbose_name_plural = 'произведения'
+        ordering = ('name',)
 
     def __str__(self):
         return self.name
@@ -175,6 +170,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'отзыв'
         verbose_name_plural = 'отзывы'
+        ordering = ('-pub_date',)
         constraints = [
             models.UniqueConstraint(
                 # Ограничение: один отзыв на одно произведение
@@ -213,6 +209,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'комментарий'
         verbose_name_plural = 'комментарии'
+        ordering = ('-pub_date',)
 
     def __str__(self):
         return self.text

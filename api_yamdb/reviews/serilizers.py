@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
 
-from reviews.models import Review, Title
+from reviews.models import Review, Title, Comment
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -33,3 +33,39 @@ class ReviewSerializer(serializers.ModelSerializer):
         if 0 > value > 10:
             raise serializers.ValidationError('Оценка только от 1 до 10')
         return value
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    review = serializers.SlugRelatedField(
+        slug_field='text',
+        read_only=True
+    )
+    author = serializers.SlugRelatedField(
+        slug_field='username',
+        read_only=True
+    )
+
+    class Meta:
+        fields = '__all__'
+        model = Comment
+
+
+
+'''
+class CommentSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Comment."""
+
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='username',
+    )
+
+    class Meta:
+        fields = (
+            'id',
+            'text',
+            'author',
+            'pub_date',
+        )
+        model = Comment
+'''
