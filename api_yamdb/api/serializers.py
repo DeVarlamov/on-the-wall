@@ -38,11 +38,12 @@ class UserEditSerializer(serializers.ModelSerializer):
     """Класс сериализатора для редактирования
     объектов пользовательской модели
     """
+
     username = serializers.CharField(
         max_length=150,
         validators=[
             validate_username_bad_sign,
-        ]
+        ],
     )
     email = serializers.EmailField(
         max_length=254,
@@ -145,7 +146,16 @@ class TitleGetSerializer(serializers.ModelSerializer):
 
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
+    rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
         model = Title

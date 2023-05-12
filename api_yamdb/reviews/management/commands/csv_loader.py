@@ -3,8 +3,7 @@ import csv
 from django.apps import apps
 from django.core.management import BaseCommand
 from django.db.models import Count
-from django.shortcuts import get_object_or_404
-from reviews.models import Category, Genre, Title, User
+from reviews.models import Title
 
 from api_yamdb.settings import BASE_DIR
 
@@ -31,45 +30,18 @@ class Command(BaseCommand):
                 reader = csv.DictReader(f)
                 for row in reader:
                     self.records_counter += 1
-                    self.prepare_data(row)
                     self.collect_list_to_bulk_create(
                         filename,
                         objects_to_import,
                         row,
                         model,
                     )
-                    self.import_objects_to_db(
-                        filename,
-                        model,
-                        objects_to_import,
-                    )
+            self.import_objects_to_db(
+                filename,
+                model,
+                objects_to_import,
+            )
         self.final_report()
-
-    def prepare_data(self, row):
-        """
-        Viewset для обработки операций CRUD по тайтлам.
-        """
-        if 'category' in row:
-            row['category'] = get_object_or_404(
-                Category,
-                pk=row['category'],
-            )
-        if 'author' in row:
-            row['author'] = get_object_or_404(
-                User,
-                pk=row['author'],
-            )
-        if 'title_id' in row:
-            row['title'] = get_object_or_404(
-                Title,
-                pk=row['title_id'],
-            )
-        if 'genre_id' in row:
-            row['genre'] = get_object_or_404(
-                Genre,
-                pk=row['genre_id'],
-            )
-        return row
 
     def collect_list_to_bulk_create(
         self,
@@ -78,19 +50,33 @@ class Command(BaseCommand):
         row,
         model,
     ):
+        """Наполняет лист объектами моделей
+        для последующего импорта в базу данных."""
+
         if filename == 'genre_title':
             objects_to_import.append(
-                Title.genre.through(
-                    title_id=row['title_id'],
-                    genre_id=row['genre_id'],
-                ),
+                model.genre.through(**row),
+            )
+        elif filename == 'titles':
+            objects_to_import.append(
+                model(category_id=row.pop('category'), **row),
+            )
+        elif filename == 'review':
+            objects_to_import.append(
+                model(author_id=row.pop('author'), **row),
+            )
+        elif filename == 'comments':
+            objects_to_import.append(
+                model(author_id=row.pop('author'), **row),
             )
         else:
             objects_to_import.append(model(**row))
 
     def import_objects_to_db(self, filename, model, objects_to_import):
+        """Импорт в базу данных."""
+
         if filename == 'genre_title':
-            Title.genre.through.objects.bulk_create(
+            model.genre.through.objects.bulk_create(
                 objects_to_import,
                 ignore_conflicts=True,
             )
@@ -101,6 +87,9 @@ class Command(BaseCommand):
             )
 
     def final_report(self):
+        """Выводит отчёт о количестве созданных
+        объектов в базе данных."""
+
         self.stdout.write(
             f'-----------------------------\n'
             f'Всего записей обработано: {self.records_counter}\n'
@@ -116,43 +105,3 @@ class Command(BaseCommand):
             f'Объектов Title_Genre создано: '
             f'{Title.objects.aggregate(count=Count("genre"))["count"]}\n\n',
         )
-
-
-""" def prepare_counters(self):
-        self.imported_counter = defaultdict(int)
-        self.records_counter = 0
-        # self.imported_counter = 0
-        self.skipped_counter = 0 """
-""" sequence = {
-    'users': 'User',
-    'category': 'Category',
-    'genre': 'Genre',
-    'titles': 'Title',
-    'genre_title': 'User',
-    'review': 'Review',
-    'comments': 'Comment',
-}
-path = BASE_DIR.joinpath('static', 'data')
-
-for name, model_name in sequence.items():
-    with open(f'{path}/{name}.csv') as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            print(row) """
-
-""" if filename == 'genre_title':
-                        # row['title'].genre.add(row['genre'])
-                        ls.append(
-                            Title.genre.through(
-                                title_id=row['title_id'],
-                                genre_id=row['genre_id'],
-                            ),
-                        )
-                    else:
-                        ls.append(model(**row)) """
-""" try:
-    model.objects.get_or_create(**row)
-except IntegrityError:
-    self.skipped_counter += 1
-    # print(row)
-self.imported_counter[model_name] += 1 """
