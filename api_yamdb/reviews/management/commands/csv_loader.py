@@ -3,21 +3,21 @@ import csv
 from django.apps import apps
 from django.core.management import BaseCommand
 from django.db.models import Count
-from reviews.models import Title
 
 from api_yamdb.settings import BASE_DIR
+from reviews.models import Title
 
 
 class Command(BaseCommand):
     path = BASE_DIR.joinpath('static', 'data')
     sequence = {  # последовательность чтения файлов
-        'users': 'User',
-        'category': 'Category',
-        'genre': 'Genre',
-        'titles': 'Title',
-        'genre_title': 'Title',
-        'review': 'Review',
-        'comments': 'Comment',
+        'users.csv': 'User',
+        'category.csv': 'Category',
+        'genre.csv': 'Genre',
+        'titles.csv': 'Title',
+        'genre_title.csv': 'Title',
+        'review.csv': 'Review',
+        'comments.csv': 'Comment',
     }
     help = 'Импорт из csv файлов в базу данных'
     records_counter = 0
@@ -26,7 +26,7 @@ class Command(BaseCommand):
         for filename, model_name in self.sequence.items():
             objects_to_import = []
             model = apps.get_model('reviews', model_name)
-            with open(f'{self.path}/{filename}.csv') as f:
+            with open(f'{self.path}/{filename}') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
                     self.records_counter += 1
@@ -53,19 +53,19 @@ class Command(BaseCommand):
         """Наполняет лист объектами моделей
         для последующего импорта в базу данных."""
 
-        if filename == 'genre_title':
+        if filename == 'genre_title.csv':
             objects_to_import.append(
                 model.genre.through(**row),
             )
-        elif filename == 'titles':
+        elif filename == 'titles.csv':
             objects_to_import.append(
                 model(category_id=row.pop('category'), **row),
             )
-        elif filename == 'review':
+        elif filename == 'review.csv':
             objects_to_import.append(
                 model(author_id=row.pop('author'), **row),
             )
-        elif filename == 'comments':
+        elif filename == 'comments.csv':
             objects_to_import.append(
                 model(author_id=row.pop('author'), **row),
             )
@@ -75,7 +75,7 @@ class Command(BaseCommand):
     def import_objects_to_db(self, filename, model, objects_to_import):
         """Импорт в базу данных."""
 
-        if filename == 'genre_title':
+        if filename == 'genre_title.csv':
             model.genre.through.objects.bulk_create(
                 objects_to_import,
                 ignore_conflicts=True,
@@ -102,6 +102,6 @@ class Command(BaseCommand):
                 f'{model.objects.all().count()}\n',
             )
         self.stdout.write(
-            f'Объектов Title_Genre создано: '
+            f'Отношений Title_Genre создано: '
             f'{Title.objects.aggregate(count=Count("genre"))["count"]}\n\n',
         )
