@@ -23,6 +23,13 @@ migrate:
 	@$(call my_func)
 	$(MANAGE) migrate
 
+
+
+.ONESHELL:
+csv_loader:
+	@$(call my_func)
+	$(MANAGE) csv_loader
+
 .ONESHELL:
 createsuperuser:
 	@$(call my_func)

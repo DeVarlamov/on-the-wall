@@ -42,47 +42,34 @@
 ## Подготовка и запуск проекта в dev-режиме
 
 - Клонировать репозиторий с GitHub;
-- Перейти в каталог ``api_yamdb``;
-- Установить виртуальное окружение (рекомендуемая версия Python 3.9$
+- Установить виртуальное окружение и необходимые зависимости.
 
 ```shell
-    python3.9 -m venv venv
-```
-
-- Активировать виртуальное окружение;
-
-```shell
-    source venv/bin/activate
-```
-
-- Установить зависимости (из файла requirements.txt);
-
-```shell
-    pip install -r requirements.txt
+    make install
 ```
 
 - Выполнить миграции:
 
 ```shell
-    python manage.py migrate
+    make migrate
 ```
 
 - Заполнить базу тестовыми данными:
 
 ```shell
-    python manage.py csv_loader
+    make csv_loader
 ```
 
 - Создать суперпользователя:
 
 ```shell
-    python manage.py createsuperuser
+    make createsuperuser
 ```
 
 - Запустить проект:
 
 ```shell
-    python manage.py runserver
+    make runserver
 ```
 
 После этого, проект будет доступен по адресу <http://127.0.0.1:8000/>.
