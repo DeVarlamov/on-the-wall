@@ -7,7 +7,14 @@ SHELL := /bin/bash
 define my_func
 	@
 	if [ ! $$VIRTUAL_ENV ]; then
-		source ./venv/bin/activate
+		if [ -f ./venv/bin/activate ]; then
+			source ./venv/bin/activate
+		elif [ -f ./venv/Scripts/activate ]; then
+			source ./venv/Scripts/activate
+		else
+			echo "*** Ошибка: не могу активировать виртуальное окружение!"
+			exit 1
+		fi
 	fi
 	echo "*** Виртуальное окружение активировано"
 	echo "VIRTUAL_ENV=" $$VIRTUAL_ENV
