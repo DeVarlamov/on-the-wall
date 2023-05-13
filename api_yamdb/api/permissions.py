@@ -40,10 +40,10 @@ class IsAdminUserOrReadOnly(IsAdmin):
         return request.method in permissions.SAFE_METHODS or is_admin
 
 
-
 class IsAdminModeratorAuthorPermission(permissions.BasePermission):
-
-    message = 'Запрос доступен только администратору, модератору или владельцу.'
+    message = (
+        'Запрос доступен только администратору, модератору или владельцу.'
+    )
 
     def has_permission(self, request, view):
         return (

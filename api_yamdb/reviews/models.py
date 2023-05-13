@@ -121,7 +121,7 @@ class Title(models.Model):
     )
     category = models.ForeignKey(
         Category,
-        on_delete=models.SET_NULL,  # Удаление кат-рии не удаляет пр-ние
+        on_delete=models.SET_NULL,
         related_name='titles',
         verbose_name='категория',
         null=True,
@@ -135,7 +135,8 @@ class Title(models.Model):
     )
     genre = models.ManyToManyField(
         Genre,
-        through='GenreTitle',
+        related_name='titles',
+        verbose_name='жанр',
     )
 
     class Meta:
@@ -222,8 +223,8 @@ class Comment(models.Model):
         return self.text
 
 
-class GenreTitle(models.Model):
-    """Связь жанра и произведения."""
+""" class GenreTitle(models.Model):
+    Связь жанра и произведения.
 
     genre = models.ForeignKey(
         Genre,
@@ -246,4 +247,4 @@ class GenreTitle(models.Model):
         )
 
     def __str__(self):
-        return f'{self.title} => {self.genre}'
+        return f'{self.title} => {self.genre}' """
