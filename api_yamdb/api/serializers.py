@@ -1,8 +1,9 @@
-from api.validate import validate_username_bad_sign, validate_username_me
 from django.db import IntegrityError
 from django.forms import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
+from api.validate import validate_username_bad_sign, validate_username_me
 from reviews.models import Category, Genre, Title, User
 
 
@@ -42,7 +43,7 @@ class UserEditSerializer(serializers.ModelSerializer):
         max_length=150,
         validators=[
             validate_username_bad_sign,
-        ]
+        ],
     )
     email = serializers.EmailField(
         max_length=254,
@@ -148,5 +149,13 @@ class TitleGetSerializer(serializers.ModelSerializer):
     rating = serializers.IntegerField(read_only=True)
 
     class Meta:
-        fields = ('id', 'name', 'year', 'rating', 'description', 'genre', 'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'rating',
+            'description',
+            'genre',
+            'category',
+        )
         model = Title

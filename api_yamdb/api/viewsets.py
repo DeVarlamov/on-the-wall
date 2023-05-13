@@ -16,4 +16,5 @@ class CreateListDestroyViewSet(
     экземпляров модели.
     - `уничтожить(запрос, *args, **kwargs)`: Удалить экземпляр модели.
     """
+
     pass

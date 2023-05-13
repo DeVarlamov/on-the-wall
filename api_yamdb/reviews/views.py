@@ -1,11 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, mixins, permissions, viewsets
-from rest_framework.pagination import LimitOffsetPagination
-
-from reviews.models import Title, Review
-from reviews.serilizers import ReviewSerializer, CommentSerializer
+from rest_framework import viewsets
 
 from api.permissions import IsAdminModeratorAuthorPermission
+from reviews.models import Review, Title
+from reviews.serilizers import CommentSerializer, ReviewSerializer
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
@@ -16,7 +15,6 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.get_title().reviews.all()
-
 
     def perform_create(self, serializer):
         serializer.save(

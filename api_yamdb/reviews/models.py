@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -107,10 +109,15 @@ class Genre(models.Model):
 class Title(models.Model):
     """Произведения"""
 
-    name = models.CharField('название', max_length=200, db_index=True)
+    name = models.CharField('название', max_length=256, db_index=True)
     year = models.IntegerField(
         'год',
-        # validators=(validate_year, )
+        validators=(
+            MaxValueValidator(
+                limit_value=datetime.now().year,
+                message='год выпуска не может превышать текущий год',
+            ),
+        ),
     )
     category = models.ForeignKey(
         Category,
@@ -215,8 +222,8 @@ class Comment(models.Model):
         return self.text
 
 
-class GenreTitle(models.Model):
-    """Связь жанра и произведения."""
+""" class GenreTitle(models.Model):
+    Связь жанра и произведения.
 
     genre = models.ForeignKey(
         Genre,
@@ -239,4 +246,4 @@ class GenreTitle(models.Model):
         )
 
     def __str__(self):
-        return f'{self.title} => {self.genre}'
+        return f'{self.title} => {self.genre}' """
