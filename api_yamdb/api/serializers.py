@@ -39,6 +39,7 @@ class UserEditSerializer(serializers.ModelSerializer):
     """Класс сериализатора для редактирования
     объектов пользовательской модели
     """
+
     username = serializers.CharField(
         max_length=150,
         validators=[
