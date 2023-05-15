@@ -161,7 +161,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = TitleFilter
+    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug')
+    # filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):

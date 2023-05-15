@@ -1,5 +1,6 @@
 from django.db import IntegrityError
 from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -141,13 +142,18 @@ class TitlePostSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
         model = Title
 
+    def to_representation(self, instance):
+        super().to_representation(instance)
+
+        return TitleGetSerializer(instance).data
+
 
 class TitleGetSerializer(serializers.ModelSerializer):
     """Класс сериализатора для запросов на получение тайтлов."""
 
     category = CategorySerializer()
     genre = GenreSerializer(many=True)
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(read_only=True, default=0)
 
     class Meta:
         fields = (
