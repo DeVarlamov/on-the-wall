@@ -10,9 +10,9 @@ from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens  # type: ignore [import]
 
-from api.filters import TitleFilter
-from api.permissions import IsAdmin, IsAdminUserOrReadOnly
-from api.serializers import (
+from api.v1.filters import TitleFilter
+from api.v1.permissions import IsAdmin, IsAdminUserOrReadOnly, IsAdminModeratorAuthorPermission
+from api.v1.serializers import (
     CategorySerializer,
     GenreSerializer,
     RegisterDataSerializer,
@@ -20,10 +20,10 @@ from api.serializers import (
     TitlePostSerializer,
     TokenSerializer,
     UserEditSerializer,
-    UserSerializer,
+    UserSerializer, CommentSerializer, ReviewSerializer,
 )
-from api.viewsets import CreateListDestroyViewSet
-from reviews.models import Category, Genre, Title, User
+from api.v1.viewsets import CreateListDestroyViewSet
+from reviews.models import Category, Genre, Title, User, Review, Title
 
 
 @api_view(['POST'])
@@ -167,3 +167,34 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action in ('create', 'update', 'partial_update'):
             return TitlePostSerializer
         return TitleGetSerializer
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAdminModeratorAuthorPermission,)
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+
+    def get_queryset(self):
+        return self.get_title().reviews.all()
+
+    def perform_create(self, serializer):
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title(),
+        )
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAdminModeratorAuthorPermission,)
+
+    def get_comment(self):
+        return get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+
+    def get_queryset(self):
+        return self.get_comment().comments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.get_comment())

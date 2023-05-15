@@ -38,7 +38,7 @@ csv_loader:
 .ONESHELL:
 createsuperuser:
 	@$(call my_func)
-	$(MANAGE) createsuperuser
+	$(MANAGE) createsuperuser --username admin --email admin@yamdb.ru
 
 .ONESHELL:
 shell:
