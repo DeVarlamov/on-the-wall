@@ -1,31 +1,30 @@
 import csv
 
-from django.apps import apps
 from django.core.management import BaseCommand
 from django.db.models import Count
 
 from api_yamdb.settings import BASE_DIR
-from reviews.models import Title
+from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class Command(BaseCommand):
     path = BASE_DIR.joinpath('static', 'data')
     sequence = {  # последовательность чтения файлов
-        'users.csv': 'User',
-        'category.csv': 'Category',
-        'genre.csv': 'Genre',
-        'titles.csv': 'Title',
-        'genre_title.csv': 'Title',
-        'review.csv': 'Review',
-        'comments.csv': 'Comment',
+        'users.csv': User,
+        'category.csv': Category,
+        'genre.csv': Genre,
+        'titles.csv': Title,
+        'genre_title.csv': Title,
+        'review.csv': Review,
+        'comments.csv': Comment,
     }
     help = 'Импорт из csv файлов в базу данных'
     records_counter = 0
 
     def handle(self, *args, **kwargs):
-        for filename, model_name in self.sequence.items():
+        for filename, model in self.sequence.items():
             objects_to_import = []
-            model = apps.get_model('reviews', model_name)
             with open(f'{self.path}/{filename}') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
@@ -95,10 +94,9 @@ class Command(BaseCommand):
             f'Всего записей обработано: {self.records_counter}\n'
             f'-----------------------------\n',
         )
-        for model_name in set(self.sequence.values()):
-            model = apps.get_model('reviews', model_name)
+        for model in set(self.sequence.values()):
             self.stdout.write(
-                f'Объектов {model_name} создано: '
+                f'Объектов {model.__name__} создано: '
                 f'{model.objects.all().count()}\n',
             )
         self.stdout.write(

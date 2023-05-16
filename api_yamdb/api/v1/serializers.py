@@ -1,28 +1,13 @@
-from django.db import IntegrityError
 from django.forms import ValidationError
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
-from api.validate import validate_username_bad_sign, validate_username_me
-from reviews.models import Category, Genre, Title, User
+from api.v1.validate import validate_username_bad_sign, validate_username_me
+from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
     """Класс сериализатора для пользовательской модели."""
-
-    username = serializers.CharField(
-        max_length=150,
-        validators=[
-            validate_username_bad_sign,
-            UniqueValidator(queryset=User.objects.all()),
-        ],
-        required=True,
-    )
-    email = serializers.EmailField(
-        max_length=254,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
 
     class Meta:
         fields = (
@@ -40,27 +25,6 @@ class UserEditSerializer(serializers.ModelSerializer):
     """Класс сериализатора для редактирования
     объектов пользовательской модели
     """
-
-    username = serializers.CharField(
-        max_length=150,
-        validators=[
-            validate_username_bad_sign,
-        ],
-    )
-    email = serializers.EmailField(
-        max_length=254,
-    )
-    role = serializers.CharField(
-        max_length=20,
-        read_only=True,
-    )
-    bio = serializers.CharField()
-    first_name = serializers.CharField(
-        max_length=150,
-    )
-    last_name = serializers.CharField(
-        max_length=150,
-    )
 
     class Meta:
         fields = (
@@ -91,11 +55,19 @@ class RegisterDataSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Метод создает новый пользовательский объект"""
-        try:
-            user = User.objects.get_or_create(**validated_data)[0]
-        except IntegrityError:
+        user_by_username = User.objects.filter(
+            username=validated_data.get('username'),
+        ).first()
+        user_by_email = User.objects.filter(
+            email=validated_data.get('email'),
+        ).first()
+        if not any((user_by_username, user_by_email)):
+            user = User.objects.create(**validated_data)
+            return user
+        elif user_by_email == user_by_username:
+            return user_by_username
+        else:
             raise ValidationError('User или Email уже заняты')
-        return user
 
     class Meta:
         fields = ('username', 'email')
@@ -143,8 +115,6 @@ class TitlePostSerializer(serializers.ModelSerializer):
         model = Title
 
     def to_representation(self, instance):
-        super().to_representation(instance)
-
         return TitleGetSerializer(instance).data
 
 
@@ -166,3 +136,41 @@ class TitleGetSerializer(serializers.ModelSerializer):
             'category',
         )
         model = Title
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(  # type: ignore [var-annotated]
+        read_only=True,
+        slug_field='username',
+    )
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        model = Review
+
+    def validate(self, data):
+        """Предотвращает повторные отзывы от одного пользователя"""
+        if self.context.get('request').method != 'POST':
+            return data
+        if (
+            self.context.get('request').method == 'POST'
+            and Review.objects.filter(
+                author=self.context.get('request').user,
+                title=self.context.get('view').kwargs.get('title_id'),
+            ).exists()
+        ):
+            raise serializers.ValidationError(
+                'Ваш отзыв уже имеется',
+            )
+        return data
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.SlugRelatedField(  # type: ignore [var-annotated]
+        slug_field='username',
+        read_only=True,
+    )
+
+    class Meta:
+        exclude = ['review']
+        model = Comment

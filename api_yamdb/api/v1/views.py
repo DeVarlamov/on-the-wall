@@ -10,20 +10,28 @@ from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens  # type: ignore [import]
 
-from api.filters import TitleFilter
-from api.permissions import IsAdmin, IsAdminUserOrReadOnly
-from api.serializers import (
+from api.v1.filters import TitleFilter
+from api.v1.permissions import (
+    IsAdmin,
+    IsAdminModeratorAuthorPermission,
+    IsAdminUserOrReadOnly,
+)
+from api.v1.serializers import (
     CategorySerializer,
+    CommentSerializer,
     GenreSerializer,
     RegisterDataSerializer,
+    ReviewSerializer,
     TitleGetSerializer,
     TitlePostSerializer,
     TokenSerializer,
     UserEditSerializer,
     UserSerializer,
 )
-from api.viewsets import CreateListDestroyViewSet
-from reviews.models import Category, Genre, Title, User
+from api.v1.viewsets import CreateListDestroyViewSet
+from api_yamdb.settings import EMAIL_HOST_USER
+from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 
 @api_view(['POST'])
@@ -44,7 +52,7 @@ def register(request):
     send_mail(
         subject='YaMDb registration',
         message=f'Your confirmation code: {confirmation_code}',
-        from_email=None,
+        from_email=EMAIL_HOST_USER,
         recipient_list=[user.email],
     )
 
@@ -108,16 +116,14 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == 'PATCH':
-            serializer = self.get_serializer(
-                user,
-                data=request.data,
-                partial=True,
-            )
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GenreViewSet(CreateListDestroyViewSet):
@@ -127,10 +133,6 @@ class GenreViewSet(CreateListDestroyViewSet):
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminUserOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class CategoryViewSet(CreateListDestroyViewSet):
@@ -140,10 +142,6 @@ class CategoryViewSet(CreateListDestroyViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminUserOrReadOnly,)
-    filter_backends = (SearchFilter,)
-    search_fields = ('name',)
-    lookup_field = 'slug'
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -161,10 +159,47 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('name', 'year', 'genre__slug', 'category__slug')
-    # filterset_class = TitleFilter
+    filterset_class = TitleFilter
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
             return TitlePostSerializer
         return TitleGetSerializer
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    serializer_class = ReviewSerializer
+    permission_classes = (IsAdminModeratorAuthorPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_title(self):
+        return get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+
+    def get_queryset(self):
+        return self.get_title().reviews.all()
+
+    def perform_create(self, serializer):
+        serializer.save(
+            author=self.request.user,
+            title=self.get_title(),
+        )
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = (IsAdminModeratorAuthorPermission,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
+
+    def get_review(self):
+        return get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id'),
+        )
+
+    def get_queryset(self):
+        return self.get_review().comments.all()
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user, review=self.get_review())

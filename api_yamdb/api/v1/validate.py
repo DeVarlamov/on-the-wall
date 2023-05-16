@@ -6,7 +6,7 @@ from rest_framework import serializers
 def validate_username_me(value):
     """Валидации запрета имя пользователя МЕ"""
     if value.lower() == 'me':
-        raise serializers.ValidationError('Имя пользователя "me" недопустимо')
+        raise serializers.ValidationError('Имя пользователя `me` недопустимо')
     return value
 
 

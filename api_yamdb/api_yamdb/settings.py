@@ -18,8 +18,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'reviews',
     'api',
+    'reviews',
+    'users',
 ]
 
 REST_FRAMEWORK = {
@@ -100,6 +101,8 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
+EMAIL_HOST_USER = 'youremail@gmail.com'
+
 EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 TOKEN_EMAIL = 'super@yamdb.test'
@@ -110,6 +113,10 @@ SIMPLE_JWT = {
 }
 
 
-AUTH_USER_MODEL = 'reviews.User'
+AUTH_USER_MODEL = 'users.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TRUNCATE_LENGTH = 15
+
+MAX_NAME_LENGTH = 256
