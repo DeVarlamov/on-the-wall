@@ -14,6 +14,9 @@ class IsAdmin(permissions.BasePermission):
     has_permission(self, request, view): проверяет, есть ли у запрашивающего
     пользователя разрешение на запрашиваемое действие.
     """
+    message = (
+        'Вы не являетесь администратором и не можете выполнить это действие.'
+    )
 
     def has_permission(self, request, view):
         return request.user.is_authenticated and (
@@ -34,6 +37,7 @@ class IsAdminUserOrReadOnly(IsAdmin):
     has_permission(self, request, view): проверяет, есть ли у запрашивающего
     пользователя разрешение на запрашиваемое действие.
     """
+    message = ('Вы не имеете разрешения на выполнение этого действия.')
 
     def has_permission(self, request, view):
         is_admin = super().has_permission(request, view)
@@ -52,9 +56,12 @@ class IsAdminModeratorAuthorPermission(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
+        if request.method == 'POST':
+            return True
+        if request.method in permissions.SAFE_METHODS:
+            return True
         return (
-            request.method in permissions.SAFE_METHODS
-            or obj.author == request.user
+            obj.author == request.user
             or request.user.is_moderator
             or request.user.is_admin
         )
