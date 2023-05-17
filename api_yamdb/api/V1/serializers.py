@@ -36,7 +36,7 @@ class RegisterDataSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         max_length=150,
         validators=[
-            validate_username
+            validate_username,
         ],
     )
     email = serializers.EmailField(
@@ -119,7 +119,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         model = Title
 
@@ -134,7 +134,7 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date')
+        fields = ('id', 'text', 'author', 'score', 'pub_date',)
         model = Review
 
     def validate(self, data):
@@ -164,5 +164,5 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'review', 'author', 'text', 'pub_date')
+        fields = ('id', 'review', 'author', 'text', 'pub_date',)
         model = Comment
