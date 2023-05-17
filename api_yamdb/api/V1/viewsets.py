@@ -1,4 +1,7 @@
 from rest_framework import mixins, viewsets
+from rest_framework.filters import SearchFilter
+
+from api.V1.permissions import IsAdminUserOrReadOnly
 
 
 class CreateListDestroyViewSet(
@@ -17,4 +20,8 @@ class CreateListDestroyViewSet(
     - `уничтожить(запрос, *args, **kwargs)`: Удалить экземпляр модели.
     """
 
-    pass
+    permission_classes = (IsAdminUserOrReadOnly,)
+    filter_backends = (SearchFilter,)
+    search_fields = ('name',)
+    lookup_field = 'slug'
+    http_method_names = ['get', 'post', 'delete']
