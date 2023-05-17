@@ -116,3 +116,11 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'user.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TRUNCATE_LENGTH = 15
+
+MAX_NAME_LENGTH = 256
+
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'

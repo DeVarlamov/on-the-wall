@@ -1,13 +1,9 @@
+from api.V1.validate import validate_username
 from django.contrib.auth.models import AbstractUser
-
 from django.db import models
 
-from api.V1.validate import validate_username
+from api_yamdb.settings import ADMIN, MODERATOR, USER
 
-
-USER = 'user'
-ADMIN = 'admin'
-MODERATOR = 'moderator'
 
 ROLE_CHOICES = [
     (USER, USER),
@@ -17,39 +13,33 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
-    """Модель пользователя.
-
-    Её необходимо переопределить, что бы добавить
-    поля с биографией, ролью и т.д.
-    """
+    """Модель пользователя."""
 
     username = models.CharField(
-        validators=(validate_username,),
+        'имя пользователя',
         max_length=150,
         unique=True,
         db_index=True,
-        verbose_name='Имя пользователя'
+        validators=(
+            validate_username,
+            ),
     )
-    email = models.EmailField(
-        unique=True,
-        db_index=True,
-        verbose_name='email пользоаптеля'
-    )
+    email = models.EmailField(unique=True)
     role = models.CharField(
-        verbose_name='роль',
-        max_length=50,
+        'роль',
+        max_length=100,
         choices=ROLE_CHOICES,
         default=USER,
         blank=True,
     )
     bio = models.TextField(
-        verbose_name='о себе любимом',
+        'биография',
         blank=True,
     )
 
     @property
     def is_admin(self):
-        return self.role == ADMIN
+        return self.role == ADMIN or self.is_superuser
 
     @property
     def is_moderator(self):
