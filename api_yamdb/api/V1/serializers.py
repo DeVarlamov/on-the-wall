@@ -1,11 +1,9 @@
+from api.V1.validate import validate_username
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from api.V1.validate import validate_username
-from user.models import User
-
 from reviews.models import Category, Comment, Genre, Review, Title
+from user.models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -40,10 +38,10 @@ class RegisterDataSerializer(serializers.ModelSerializer):
         validators=[
             validate_username
         ],
-    )
+    ),
     email = serializers.EmailField(
         max_length=254,
-    )
+    ),
 
     def create(self, validated_data):
         """Метод создает новый пользовательский объект"""

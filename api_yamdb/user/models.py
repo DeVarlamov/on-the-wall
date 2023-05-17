@@ -4,7 +4,6 @@ from django.db import models
 
 from api_yamdb.settings import ADMIN, MODERATOR, USER
 
-
 ROLE_CHOICES = [
     (USER, USER),
     (ADMIN, ADMIN),
@@ -23,7 +22,7 @@ class User(AbstractUser):
         validators=(
             validate_username,
             ),
-    )
+            ),
     email = models.EmailField(unique=True)
     role = models.CharField(
         'роль',
