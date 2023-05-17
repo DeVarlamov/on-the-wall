@@ -1,5 +1,5 @@
 from api.V1.validate import validate_username
-from django.forms import ValidationError
+from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -36,7 +36,7 @@ class RegisterDataSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         max_length=150,
         validators=[
-            validate_username,
+            validate_username
         ],
     )
     email = serializers.EmailField(
@@ -119,7 +119,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
         model = Title
 

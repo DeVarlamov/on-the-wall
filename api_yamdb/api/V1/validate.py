@@ -7,11 +7,18 @@ def validate_username(value):
     """
     Валидация запрета недопустимых символов
     """
-    invalid_chars = re.findall(r'[^\w.@+-]+', value)
+    invalid_chars_regex = re.compile(r'[^\w.@+-]+')
+    invalid_chars = re.findall(invalid_chars_regex, value)
+
     if invalid_chars:
-        invalid_chars_str = ', '.join(invalid_chars)
         raise serializers.ValidationError(
-            'Имя пользователя содержит запрещенные'
-            f'символы: {invalid_chars_str}',
+            'Имя пользователя содержит недопустимые'
+            f'символы: {", ".join(invalid_chars)}',
         )
+
+    if value.lower() == 'me':
+        raise serializers.ValidationError(
+            'Имя пользователя не может быть "me".',
+        )
+
     return value
