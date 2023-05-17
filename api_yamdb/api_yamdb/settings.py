@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
+    'user',
     'reviews',
     'api',
 ]
@@ -104,12 +105,14 @@ EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 TOKEN_EMAIL = 'super@yamdb.test'
 
+DEFAULT_FROM_EMAIL = '35_team@yandex.ru'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 
-AUTH_USER_MODEL = 'reviews.User'
+AUTH_USER_MODEL = 'user.User'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
