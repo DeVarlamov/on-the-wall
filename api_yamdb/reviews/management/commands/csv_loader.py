@@ -60,11 +60,7 @@ class Command(BaseCommand):
             objects_to_import.append(
                 model(category_id=row.pop('category'), **row),
             )
-        elif filename == 'review.csv':
-            objects_to_import.append(
-                model(author_id=row.pop('author'), **row),
-            )
-        elif filename == 'comments.csv':
+        elif filename in ('review.csv', 'comments.csv'):
             objects_to_import.append(
                 model(author_id=row.pop('author'), **row),
             )

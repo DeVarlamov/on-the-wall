@@ -40,6 +40,7 @@ def register(request):
     """Функция создание  для регистрации новых пользователей."""
     serializer = RegisterDataSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
+
     try:
         user = serializer.save()
     except ValidationError as error:

@@ -44,8 +44,10 @@ class IsAdminUserOrReadOnly(IsAdmin):
     )
 
     def has_permission(self, request, view):
-        is_admin = super().has_permission(request, view)
-        return request.method in permissions.SAFE_METHODS or is_admin
+        return (
+            request.method in permissions.SAFE_METHODS
+            or super().has_permission(request, view)
+        )
 
 
 class IsAdminModeratorAuthorPermission(permissions.BasePermission):

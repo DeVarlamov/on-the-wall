@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
-from django.contrib.auth.validators import UnicodeUsernameValidator
-from django.core.exceptions import ValidationError
 from django.db import models
+
+from users.validators import validate_username_bad_sign, validate_username_me
 
 USER = 'user'
 ADMIN = 'admin'
@@ -14,13 +14,6 @@ ROLE_CHOICES = [
 ]
 
 
-def validate_username_not_equal_me(value):
-    if value != 'me':
-        return value
-    else:
-        raise ValidationError('`me` не может использоваться в качестве имени')
-
-
 class User(AbstractUser):
     """Модель пользователя."""
 
@@ -30,8 +23,8 @@ class User(AbstractUser):
         unique=True,
         db_index=True,
         validators=(
-            UnicodeUsernameValidator(),
-            validate_username_not_equal_me,
+            validate_username_bad_sign,
+            validate_username_me,
         ),
     )
     email = models.EmailField(unique=True)

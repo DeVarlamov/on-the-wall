@@ -1,9 +1,9 @@
 from django.forms import ValidationError
 from rest_framework import serializers
 
-from api.v1.validate import validate_username_bad_sign, validate_username_me
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
+from users.validators import validate_username_bad_sign, validate_username_me
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -62,8 +62,7 @@ class RegisterDataSerializer(serializers.ModelSerializer):
             email=validated_data.get('email'),
         ).first()
         if not any((user_by_username, user_by_email)):
-            user = User.objects.create(**validated_data)
-            return user
+            return User.objects.create(**validated_data)
         elif user_by_email == user_by_username:
             return user_by_username
         else:
