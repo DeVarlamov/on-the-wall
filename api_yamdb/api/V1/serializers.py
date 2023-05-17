@@ -36,12 +36,12 @@ class RegisterDataSerializer(serializers.ModelSerializer):
     username = serializers.CharField(
         max_length=150,
         validators=[
-            validate_username
+            validate_username,
         ],
-    ),
+    )
     email = serializers.EmailField(
         max_length=254,
-    ),
+    )
 
     def create(self, validated_data):
         """Метод создает новый пользовательский объект"""
@@ -119,7 +119,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category',
         )
         model = Title
 

@@ -20,9 +20,7 @@ class User(AbstractUser):
         unique=True,
         db_index=True,
         validators=(
-            validate_username,
-            ),
-            ),
+            validate_username,))
     email = models.EmailField(unique=True)
     role = models.CharField(
         'роль',
