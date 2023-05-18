@@ -1,4 +1,3 @@
-
 from django.core.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -164,10 +163,6 @@ class ReviewSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    #review = serializers.SlugRelatedField(  # type: ignore [var-annotated]
-    #    slug_field='text',
-    #    read_only=True,
-    #)
     author = serializers.SlugRelatedField(  # type: ignore [var-annotated]
         slug_field='username',
         read_only=True,

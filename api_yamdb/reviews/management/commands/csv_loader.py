@@ -1,29 +1,29 @@
 import csv
 
+from django.apps import apps
 from django.core.management import BaseCommand
 from django.db.models import Count
 
 from api_yamdb.settings import BASE_DIR
-from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import User
+from reviews.models import Title
 
 
 class Command(BaseCommand):
     path = BASE_DIR.joinpath('static', 'data')
     sequence = {  # последовательность чтения файлов
-        'users.csv': User,
-        'category.csv': Category,
-        'genre.csv': Genre,
-        'titles.csv': Title,
-        'genre_title.csv': Title,
-        'review.csv': Review,
-        'comments.csv': Comment,
+        'users.csv': 'User',
+        'category.csv': 'Category',
+        'genre.csv': 'Genre',
+        'titles.csv': 'Title',
+        'genre_title.csv': 'Title',
+        'review.csv': 'Review',
+        'comments.csv': 'Comment',
     }
     help = 'Импорт из csv файлов в базу данных'
     records_counter = 0
 
     def handle(self, *args, **kwargs):
-        for filename, model in self.sequence.items():
+        for filename, model_name in self.sequence.items():
             objects_to_import = []
             if model_name == 'User':
                 app_name = 'user'
@@ -65,7 +65,11 @@ class Command(BaseCommand):
             objects_to_import.append(
                 model(category_id=row.pop('category'), **row),
             )
-        elif filename in ('review.csv', 'comments.csv'):
+        elif filename == 'review.csv':
+            objects_to_import.append(
+                model(author_id=row.pop('author'), **row),
+            )
+        elif filename == 'comments.csv':
             objects_to_import.append(
                 model(author_id=row.pop('author'), **row),
             )
@@ -102,7 +106,7 @@ class Command(BaseCommand):
                 app_name = 'reviews'
             model = apps.get_model(app_name, model_name)
             self.stdout.write(
-                f'Объектов {model.__name__} создано: '
+                f'Объектов {model_name} создано: '
                 f'{model.objects.all().count()}\n',
             )
         self.stdout.write(
