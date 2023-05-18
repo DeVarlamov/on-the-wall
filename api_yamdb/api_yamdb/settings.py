@@ -27,7 +27,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS':
+    'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
 }
 
@@ -107,16 +108,24 @@ EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 
 TOKEN_EMAIL = 'super@yamdb.test'
 
+DEFAULT_FROM_EMAIL = '35_team@yandex.ru'
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 
+
 AUTH_USER_MODEL = 'users.User'
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TRUNCATE_LENGTH = 15
 
 MAX_NAME_LENGTH = 256
+
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
