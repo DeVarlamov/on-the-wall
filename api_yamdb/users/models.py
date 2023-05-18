@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from users.validators import validate_username_bad_sign, validate_username_me
+from users.validators import validate_username
 
 USER = 'user'
 ADMIN = 'admin'
@@ -22,10 +22,7 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         db_index=True,
-        validators=(
-            validate_username_bad_sign,
-            validate_username_me,
-        ),
+        validators=(validate_username,),
     )
     email = models.EmailField(unique=True)
     role = models.CharField(

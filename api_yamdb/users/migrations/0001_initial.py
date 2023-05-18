@@ -87,8 +87,7 @@ class Migration(migrations.Migration):
                         max_length=150,
                         unique=True,
                         validators=[
-                            users.validators.validate_username_bad_sign,
-                            users.validators.validate_username_me,
+                            users.validators.validate_username,
                         ],
                         verbose_name='имя пользователя',
                     ),

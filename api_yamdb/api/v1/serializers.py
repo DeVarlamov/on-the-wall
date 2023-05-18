@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from reviews.models import Category, Comment, Genre, Review, Title
 from users.models import User
-from users.validators import validate_username_bad_sign, validate_username_me
+from users.validators import validate_username
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -44,10 +44,7 @@ class RegisterDataSerializer(serializers.ModelSerializer):
 
     username = serializers.CharField(
         max_length=150,
-        validators=[
-            validate_username_me,
-            validate_username_bad_sign,
-        ],
+        validators=(validate_username,),
     )
     email = serializers.EmailField(
         max_length=254,
@@ -65,8 +62,7 @@ class RegisterDataSerializer(serializers.ModelSerializer):
             return User.objects.create(**validated_data)
         elif user_by_email == user_by_username:
             return user_by_username
-        else:
-            raise ValidationError('User или Email уже заняты')
+        raise ValidationError('User или Email уже заняты')
 
     class Meta:
         fields = ('username', 'email')
@@ -110,7 +106,14 @@ class TitlePostSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+        fields = (
+            'id',
+            'name',
+            'year',
+            'description',
+            'genre',
+            'category',
+        )
         model = Title
 
     def to_representation(self, instance):

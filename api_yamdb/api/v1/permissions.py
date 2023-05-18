@@ -16,8 +16,8 @@ class IsAdmin(permissions.BasePermission):
     """
 
     message = (
-        'Запрос может быть выполнен только пользователем с'
-        'правами администратора.'
+        'Запрос может быть выполнен только пользователем '
+        'с правами администратора.'
     )
 
     def has_permission(self, request, view):
@@ -63,7 +63,7 @@ class IsAdminModeratorAuthorPermission(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method == 'POST':
-            return request.user.is_authenticated
+            return True
         return (
             request.method in permissions.SAFE_METHODS
             or request.user.is_moderator

@@ -3,19 +3,22 @@ import re
 from django.core.exceptions import ValidationError
 
 
-def validate_username_me(value):
-    """Валидации запрета имя пользователя МЕ"""
-    if value.lower() == 'me':
-        raise ValidationError('Имя пользователя `me` недопустимо')
-    return value
+def validate_username(value):
+    """
+    Валидация запрета недопустимых символов
+    """
+    invalid_chars_regex = re.compile(r'[^\w.@+-]+')
+    invalid_chars = re.findall(invalid_chars_regex, value)
 
-
-def validate_username_bad_sign(value):
-    """Валидация запрета недопустимых символов"""
-    legals = re.compile(r'^[\w.@+-]+\Z')
-    if not re.match(legals, value):
+    if invalid_chars:
         raise ValidationError(
-            f'Имя пользователя содержит недопустимые символы: '
-            f'{" ".join([char for char in value if not legals.match(char)])}',
+            'Имя пользователя содержит недопустимые'
+            f'символы: {", ".join(invalid_chars)}',
         )
+
+    if value.lower() == 'me':
+        raise ValidationError(
+            'Имя пользователя не может быть "me".',
+        )
+
     return value

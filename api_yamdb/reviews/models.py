@@ -108,7 +108,7 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='автор',
     )
-    text = models.CharField('текст', max_length=5000)
+    text = models.TextField('текст')
     score = models.IntegerField(
         'оценка',
         validators=(MinValueValidator(1), MaxValueValidator(10)),
@@ -156,7 +156,7 @@ class Comment(models.Model):
         related_name='comments',
         verbose_name='автор',
     )
-    text = models.CharField('текст комментария', max_length=2000)
+    text = models.TextField('текст комментария')
     pub_date = models.DateTimeField(
         'дата публикации',
         auto_now_add=True,
