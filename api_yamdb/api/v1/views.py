@@ -1,12 +1,3 @@
-from api.V1.filters import TitleFilter
-from api.V1.permissions import (IsAdmin, IsAdminModeratorAuthorPermission,
-                                IsAdminUserOrReadOnly)
-from api.V1.serializers import (CategorySerializer, CommentSerializer,
-                                GenreSerializer, RegisterDataSerializer,
-                                ReviewSerializer, TitleGetSerializer,
-                                TitlePostSerializer, TokenSerializer,
-                                UserEditSerializer, UserSerializer)
-from api.V1.viewsets import CreateListDestroyViewSet
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -19,6 +10,26 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework_simplejwt import tokens
+
+from api.v1.filters import TitleFilter
+from api.v1.permissions import (
+    IsAdmin,
+    IsAdminModeratorAuthorPermission,
+    IsAdminUserOrReadOnly,
+)
+from api.v1.serializers import (
+    CategorySerializer,
+    CommentSerializer,
+    GenreSerializer,
+    RegisterDataSerializer,
+    ReviewSerializer,
+    TitleGetSerializer,
+    TitlePostSerializer,
+    TokenSerializer,
+    UserEditSerializer,
+    UserSerializer,
+)
+from api.v1.viewsets import CreateListDestroyViewSet
 from reviews.models import Category, Genre, Review, Title
 from user.models import User
 
@@ -105,7 +116,6 @@ class UserViewSet(viewsets.ModelViewSet):
         if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        request.method == 'PATCH'
         serializer = self.get_serializer(
             user,
             data=request.data,
@@ -149,6 +159,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
+    http_method_names = ['get', 'post', 'patch', 'delete']
     filterset_class = TitleFilter
 
     def get_serializer_class(self):
