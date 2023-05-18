@@ -2,12 +2,11 @@ from datetime import datetime
 
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from user.models import User
 
 from api_yamdb.settings import MAX_NAME_LENGTH, TRUNCATE_LENGTH
+from user.models import User
 
 from users.models import User
-
 
 
 class Category(models.Model):
@@ -111,7 +110,6 @@ class Review(models.Model):
         related_name='reviews',
         verbose_name='автор',
     )
-
     text = models.TextField('текст')
     score = models.IntegerField(
         'оценка',

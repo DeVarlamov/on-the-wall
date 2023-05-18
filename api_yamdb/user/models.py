@@ -1,7 +1,7 @@
-from api.V1.validate import validate_username
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+from api.v1.validate import validate_username
 from api_yamdb.settings import ADMIN, MODERATOR, USER
 
 ROLE_CHOICES = [
@@ -19,8 +19,8 @@ class User(AbstractUser):
         max_length=150,
         unique=True,
         db_index=True,
-        validators=(
-            validate_username,))
+        validators=(validate_username,),
+    )
     email = models.EmailField(unique=True)
     role = models.CharField(
         'роль',

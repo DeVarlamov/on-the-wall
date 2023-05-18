@@ -1,3 +1,5 @@
+
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db.models import Avg
@@ -8,7 +10,7 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
-from rest_framework_simplejwt import tokens  # type: ignore [import]
+from rest_framework_simplejwt import tokens
 
 from api.v1.filters import TitleFilter
 from api.v1.permissions import (
@@ -29,9 +31,8 @@ from api.v1.serializers import (
     UserSerializer,
 )
 from api.v1.viewsets import CreateListDestroyViewSet
-from api_yamdb.settings import EMAIL_HOST_USER
 from reviews.models import Category, Genre, Review, Title
-from users.models import User
+from user.models import User
 
 
 @api_view(['POST'])
@@ -40,7 +41,6 @@ def register(request):
     """Функция создание  для регистрации новых пользователей."""
     serializer = RegisterDataSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-
     try:
         user = serializer.save()
     except ValidationError as error:
@@ -53,7 +53,7 @@ def register(request):
     send_mail(
         subject='YaMDb registration',
         message=f'Your confirmation code: {confirmation_code}',
-        from_email=EMAIL_HOST_USER,
+        from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[user.email],
     )
 
@@ -160,8 +160,8 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     permission_classes = (IsAdminUserOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
-    filterset_class = TitleFilter
     http_method_names = ['get', 'post', 'patch', 'delete']
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
@@ -192,15 +192,14 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminModeratorAuthorPermission,)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
-    def get_review(self):
-        return get_object_or_404(
-            Review,
-            pk=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id'),
-        )
+    def get_comment(self):
+        review_id = self.kwargs.get('review_id')
+        title_id = self.kwargs.get('title_id')
+        review = get_object_or_404(Review, pk=review_id, title_id=title_id)
+        return review
 
     def get_queryset(self):
-        return self.get_review().comments.all()
+        return self.get_comment().comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, review=self.get_review())
+        serializer.save(author=self.request.user, review=self.get_comment())

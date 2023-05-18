@@ -25,6 +25,11 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         for filename, model in self.sequence.items():
             objects_to_import = []
+            if model_name == 'User':
+                app_name = 'user'
+            else:
+                app_name = 'reviews'
+            model = apps.get_model(app_name, model_name)
             with open(f'{self.path}/{filename}') as f:
                 reader = csv.DictReader(f)
                 for row in reader:
@@ -90,7 +95,12 @@ class Command(BaseCommand):
             f'Всего записей обработано: {self.records_counter}\n'
             f'-----------------------------\n',
         )
-        for model in set(self.sequence.values()):
+        for model_name in set(self.sequence.values()):
+            if model_name == 'User':
+                app_name = 'user'
+            else:
+                app_name = 'reviews'
+            model = apps.get_model(app_name, model_name)
             self.stdout.write(
                 f'Объектов {model.__name__} создано: '
                 f'{model.objects.all().count()}\n',
