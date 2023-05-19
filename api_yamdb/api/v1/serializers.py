@@ -158,7 +158,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             title = get_object_or_404(Title, pk=title_id)
             if Review.objects.filter(title=title, author=author).exists():
                 raise ValidationError('Ваш отзыв уже имеется')
-        # title = get_object_or_404(Title, pk=title_id)
         return data
 
 
